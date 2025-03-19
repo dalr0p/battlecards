@@ -1,0 +1,2483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+  />
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.12/marked.min.js"></script>
+  <title>Hitachi Detection Battlecards</title>
+
+  <style>
+    :root {
+      --scrollbar-track-light: #f5f5f5;
+      --scrollbar-thumb-light: #0096ff;
+      --scrollbar-track-dark: #2d2d30;
+      --scrollbar-thumb-dark: #a37acc;
+    }
+	.content-area {
+		margin-top: 60px;  /* or whatever .top-bar’s height is */
+	  flex: 1;         /* fill leftover space below top-bar */
+	  overflow-y: auto;/* optional if you want scrolling */
+	  padding: 20px;   /* replace the old body padding */
+	}
+	#wrapper {
+	  display: flex;
+	  min-height: 100vh; /* ensures wrapper is at least full viewport height */
+	  margin: 0;
+	  padding: 0;
+	  box-sizing: border-box;
+	}
+	.filter-row {
+	  margin: 10px auto 20px;
+	  text-align: center;
+	  display: flex;
+	  justify-content: center;
+	  align-items: center;
+	  gap: 15px;
+	}
+			/* New layout for each filter line */
+		.filter-dropdown .filter-line {
+		  display: flex;
+		  align-items: center;
+		  gap: 8px;
+		  margin-bottom: 10px;
+		}
+
+		/* Style for the clear filters button */
+		.filter-dropdown .clear-filters-btn {
+		  background: #0096ff;
+		  color: #fff;
+		  border: none;
+		  padding: 8px 12px;
+		  font-size: 14px;
+		  border-radius: 5px;
+		  cursor: pointer;
+		  transition: background 0.3s ease;
+		  width: 100%;
+		}
+
+		.filter-dropdown .clear-filters-btn:hover {
+		  background: #007acc;
+		}
+
+		/* Dark mode overrides for the dropdown and clear button */
+		body.dark-mode .filter-dropdown {
+		  background-color: #2d2d30;
+		  border: 1px solid #a37acc;
+		  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+		}
+
+		body.dark-mode .filter-dropdown label {
+		  color: #c9d1d9;
+		}
+
+		body.dark-mode .filter-dropdown select {
+		  background-color: #2d2d30;
+		  border: 1px solid #a37acc;
+		  color: #c9d1d9;
+		}
+
+		body.dark-mode .filter-dropdown select:focus {
+		  border-color: #b58ddb;
+		}
+
+		body.dark-mode .filter-dropdown .clear-filters-btn {
+		  background: #a37acc;
+		}
+
+		body.dark-mode .filter-dropdown .clear-filters-btn:hover {
+		  background: #b58ddb;
+		}
+
+.top-bar #sidebar-logo .logo {
+  height: 100%;
+  width: auto; /* adjust to preserve aspect ratio */
+  object-fit: contain;
+}
+
+.top-bar #sidebar-logo {
+	margin-left: -7px;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  height: 36px; /* same height as the icon buttons */
+}
+
+	/* Light mode */
+	.filter-row select {
+	  padding: 8px 12px;
+	  font-size: 14px;
+	  border: 2px solid #0096ff;
+	  border-radius: 8px;
+	  background: #fff;
+	  color: #333;
+	  box-shadow: 0 3px 5px rgba(0,0,0,0.1);
+	  transition: all 0.3s ease;
+	  appearance: none;       /* Hide default arrow for some browsers */
+	  background-image: url("data:image/svg+xml,%3Csvg fill='%230096ff' ...%3C/svg%3E");
+	  background-repeat: no-repeat;
+	  background-position: right 10px center;
+	  background-size: 16px;
+	}
+
+	/* On hover/focus in light mode */
+	.filter-row select:hover,
+	.filter-row select:focus {
+	  border-color: #007acc;
+	  box-shadow: 0 3px 7px rgba(0,0,0,0.2);
+	  outline: none;
+	}
+
+	/* Dark mode */
+	body.dark-mode .filter-row select {
+	  background: #2d2d30;
+	  color: #c9d1d9;
+	  border: 2px solid #a37acc;
+	  box-shadow: 0 3px 5px rgba(0,0,0,0.5);
+	  background-image: url("data:image/svg+xml,%3Csvg fill='%23a37acc' ...%3C/svg%3E");
+	}
+
+	body.dark-mode .filter-row select:hover,
+	body.dark-mode .filter-row select:focus {
+	  border-color: #b58ddb;
+	  box-shadow: 0 3px 7px rgba(0,0,0,0.7);
+	}
+
+
+	.technology-icon,
+	.client-tag {
+	  background: rgba(0, 150, 255, 0.90); /* Light mode: bright blue */
+	  color: #fff;
+	  padding: 4px 8px;
+	  border-radius: 8px;
+	  font-size: 12px;
+	  margin-right: 6px;
+	  display: none;
+	  transition: background 0.3s;
+	}
+
+	/* If you like a hover effect in light mode: */
+	.technology-icon:hover,
+	.client-tag:hover {
+	  background: #007acc;
+	}
+
+	/* Dark mode override */
+	body.dark-mode .technology-icon,
+	body.dark-mode .client-tag {
+	background: rgba(108, 75, 163, 0.60); /* or #a37acc, whichever purple you prefer */
+	  color: #fff;
+	}
+	body.dark-mode .technology-icon:hover,
+	body.dark-mode .client-tag:hover {
+	  background: #a37acc; /* a lighter or darker purple on hover */
+	}
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0; /* now spans all the way to the left */
+  right: 0;
+  z-index: 1100; /* make sure header is above the sidebar */
+  transition: left 0.3s ease;
+  background: #fff;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.top-bar-inner {
+  max-width: 1200px;        /* or whatever container limit you like */
+  margin: 0 auto;           /* centers the content horizontally */
+  padding: 0 30px;          /* matches grid-container padding if you want the same indent */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;             /* optional if you want a fixed height */
+}
+/* Dark Mode override: */
+body.dark-mode .top-bar {
+  background: #2d2d30;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.left-section h1 {
+  font-size: 20px;
+  margin: 0;
+  color: #333;
+}
+body.dark-mode .left-section h1 {
+  color: #c9d1d9;
+}
+
+/* Right icons container */
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: visible;
+}
+
+/* Icon button style */
+.icon-button {
+  width: 36px; 
+  height: 36px;
+  border-radius: 18px;
+  background: #0096ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.icon-button:hover {
+  background: #007acc;
+}
+
+/* Dark mode icon button */
+body.dark-mode .icon-button {
+  background: #6c4ba3;
+}
+body.dark-mode .icon-button:hover {
+  background: #a37acc;
+}
+
+/* Search container is hidden by default */
+.search-input-container {
+  position: relative;
+  width: 0;           /* collapsed width */
+  overflow: hidden;
+  transition: width 0.3s ease;
+  margin-left: 5px;   /* small spacing from the icon */
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.search-input-container input {
+  width: 100%;
+  border: 2px solid #0096ff;
+  border-radius: 20px;
+  box-sizing: border-box;
+  padding: 6px 10px;
+  outline: none;
+  transition: border 0.2s;
+}
+.search-input-container input:focus {
+  border-color: #007acc;
+}
+
+/* Dark mode for the input */
+body.dark-mode .search-input-container input {
+  background: #2d2d30;
+  color: #c9d1d9;
+  border: 2px solid #a37acc;
+}
+body.dark-mode .search-input-container input:focus {
+  border-color: #b58ddb;
+}
+
+/* When expanded, set a bigger width - e.g. 180px or so */
+.search-input-container.expanded {
+  width: 180px;
+}
+
+/* Filter dropdown hidden by default */
+.filter-dropdown {
+  display: none;
+  position: absolute;
+  top: 50px; /* slightly below the top bar */
+  right: 10px;
+  background-color: #ffffff;
+  border: 1px solid #0096ff;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 3000;
+  min-width: 220px;
+}
+
+body.dark-mode .filter-dropdown {
+  background-color: #2d2d30;
+  border: 1px solid #a37acc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .filter-dropdown label {
+  color: #c9d1d9;
+}
+
+body.dark-mode .filter-dropdown select {
+  background-color: #2d2d30;
+  border: 1px solid #a37acc;
+  color: #c9d1d9;
+}
+
+body.dark-mode .filter-dropdown select:focus {
+  border-color: #b58ddb;
+}
+
+/* Show it with a CSS class, e.g. .show */
+.filter-dropdown.show {
+  display: block;
+}
+
+.filter-dropdown select {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #0096ff;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  background-color: #ffffff;
+  color: #333;
+  transition: border-color 0.3s ease;
+}
+.filter-dropdown select:focus {
+  outline: none;
+  border-color: #007acc;
+}
+.filter-dropdown label {
+  display: block;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+
+
+    /* Formatting Toolbar (Header Style) */
+    #text-format-toolbar {
+      display: flex;
+      gap: 12px;
+      background: white;
+      border-bottom: 2px solid #0096ff;
+      padding: 8px 10px;
+      border-radius: 0;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      left: 0;
+      z-index: 9999;
+    }
+    #text-format-toolbar button.format-btn {
+      background: transparent;
+      border: none;
+      color: #0096ff;
+      font-size: 18px;
+      padding: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+    #text-format-toolbar button.format-btn:hover {
+      color: #007acc;
+      transform: scale(1.1);
+    }
+
+    /* Dark Mode */
+    body.dark-mode #text-format-toolbar {
+      background: #2d2d30;
+      border-bottom: 2px solid #a37acc;
+    }
+    body.dark-mode #text-format-toolbar button.format-btn {
+      color: #a37acc;
+    }
+    body.dark-mode #text-format-toolbar button.format-btn:hover {
+      color: #b58ddb;
+    }
+
+    .sidebar-footer {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 10px;
+      color: #777;
+      padding: 5px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #sidebar.expanded .sidebar-footer {
+      opacity: 1;
+    }
+    body.dark-mode .sidebar-footer {
+      color: #c9d1d9;
+    }
+
+    .favorite-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      margin-right: 5px;
+      position: relative;
+      color: #0096ff;
+    }
+    body.dark-mode .favorite-btn i {
+      color: #a37acc !important;
+    }
+
+    .grid-container pre {
+      white-space: pre-wrap;
+    }
+
+    #custom-search-container {
+      display: none;
+      position: fixed;
+      top: 35px;
+      right: 20px;
+      width: 320px;
+      height: 40px;
+      border: 1px solid #0096ff;
+      border-radius: 30px;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      align-items: center;
+      padding-right: 10px;
+      z-index: 2000;
+    }
+    #custom-search-input {
+      flex: 1;
+      height: 100%;
+      border: none;
+      outline: none;
+      padding: 0 15px;
+      font-size: 14px;
+      background: transparent;
+      color: #333;
+    }
+    #custom-search-close {
+      height: 70%;
+      padding: 0 15px;
+      background: #0096ff;
+      border: none;
+      border-radius: 20px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      outline: none;
+      transition: background 0.3s ease;
+    }
+    #custom-search-close:hover {
+      background: #007acc;
+    }
+
+    /* Dark Mode Overrides */
+    body.dark-mode #custom-search-container {
+      background: #2d2d30;
+      border: 1px solid #a37acc;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.6);
+    }
+    body.dark-mode #custom-search-input {
+      color: #c9d1d9;
+    }
+    body.dark-mode #custom-search-close {
+      background: #a37acc;
+    }
+    body.dark-mode #custom-search-close:hover {
+      background: #805cc2;
+    }
+
+    /* Default Light Mode Scrollbar */
+    ::-webkit-scrollbar {
+      width: 12px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--scrollbar-track-light);
+      border-radius: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--scrollbar-thumb-light);
+      border-radius: 6px;
+      border: 3px solid var(--scrollbar-track-light);
+    }
+    body {
+      scrollbar-width: thin;
+      scrollbar-color: var(--scrollbar-thumb-light) var(--scrollbar-track-light);
+    }
+
+    /* Dark Mode Scrollbar */
+    body.dark-mode,
+    html.dark-mode {
+      scrollbar-width: thin !important;
+      scrollbar-color: var(--scrollbar-thumb-dark) var(--scrollbar-track-dark) !important;
+    }
+    body.dark-mode::-webkit-scrollbar,
+    html.dark-mode::-webkit-scrollbar {
+      width: 12px !important;
+    }
+    body.dark-mode::-webkit-scrollbar-track,
+    html.dark-mode::-webkit-scrollbar-track {
+      background: var(--scrollbar-track-dark) !important;
+      border-radius: 6px !important;
+    }
+    body.dark-mode::-webkit-scrollbar-thumb,
+    html.dark-mode::-webkit-scrollbar-thumb {
+      background-color: var(--scrollbar-thumb-dark) !important;
+      border-radius: 6px !important;
+      border: 3px solid var(--scrollbar-track-dark) !important;
+    }
+
+    /* Clear storage modal in dark mode */
+    body.dark-mode #confirm-clear-modal-content {
+      background: #2b2b2e !important;
+      color: #c9d1d9 !important;
+    }
+    body.dark-mode #confirm-clear-modal-content h3 {
+      color: #a37acc !important;
+    }
+    body.dark-mode #confirm-clear-modal-content p {
+      color: #c9d1d9 !important;
+    }
+    body.dark-mode #cancel-clear {
+      background: #555 !important;
+      color: #fff !important;
+    }
+    body.dark-mode #cancel-clear:hover {
+      background: #666 !important;
+    }
+    body.dark-mode #confirm-clear {
+      background: #a37acc !important;
+    }
+    body.dark-mode #confirm-clear:hover {
+      background: #b58ddb !important;
+    }
+	/* Dark mode override */
+	body.dark-mode .add-btn {
+	  background: #6c4ba3; /* or #a37acc, whichever you like */
+	  color: #fff;         /* ensure text is visible */
+	}
+    /* Sidebar */
+#sidebar {
+  position: fixed;
+  top: 50px;
+  left: 0;
+  width: 50px; /* collapsed */
+  height: calc(100vh - 60px);
+  background: #fff;
+  box-sizing: border-box;
+  transition: width 0.3s ease, padding 0.3s ease;
+  /* Use flex but don’t distribute space between header and footer */
+  display: flex;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  flex-direction: column;
+  padding: 5px 5px; /* fixed vertical padding */
+  z-index: 1050; /* added z-index */
+}
+#sidebar.expanded {
+  width: 250px;
+  padding: 5px 20px;  /* vertical padding stays at 5px */
+}
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;  /* Reduced gap between items */
+}
+	
+    body.dark-mode #sidebar {
+      background: #2d2d30;
+    }
+	.sidebar-title,
+	.sidebar-footer p,
+	#sidebar .btn-text {
+	  white-space: nowrap;
+	  opacity: 0;
+	  transition: opacity 1s ease 1s;
+	  transition-delay: 1s;
+	}
+    #sidebar-header h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+    #sidebar-header .sidebar-title {
+      margin: 0;
+      font-size: 18px;
+    }
+    #sidebar:not(.expanded) .btn-text,
+    #sidebar:not(.expanded) .sidebar-title {
+      display: none;
+    }
+    bar.expanded .btn-text,
+    #sidebar.expanded .sidebar-title {
+      opacity: 1;
+    }
+    body.dark-mode #sidebar .add-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    body.dark-mode #sidebar .add-btn {
+      color: #a37acc;
+    }
+    #sidebar .add-btn {
+      background: transparent;
+      border: none;
+      padding: 10px 15px;
+      margin: 8px 0;
+      width: 100%;
+      text-align: left;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      color: #0096ff;
+    }
+    #sidebar .add-btn i {
+      margin-right: 10px;
+    }
+	#sidebar-toggle-btn {
+	  width: 30px;
+	  height: 30px;
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  margin: 0;
+	  border: none;
+	  outline: none;
+	  background: none;
+	  /* Adjust this margin until the arrow aligns perfectly with the title text */
+	  margin-top: -6px;
+	}
+    #sidebar-toggle-btn:focus {
+      outline: none;
+      box-shadow: none;
+    }
+    #sidebar-toggle-btn:hover {
+      background: transparent;
+      color: #007acc;
+    }
+    #sidebar-toggle-btn i {
+      font-size: 14px;
+      line-height: 30px;
+      color: #0096ff;
+      transition: color 0.3s ease;
+    }
+    body.dark-mode #sidebar-toggle-btn i {
+      color: #a37acc;
+    }
+    #sidebar.expanded #sidebar-toggle-btn {
+      right: 10px;
+      transform: none;
+    }
+    #sidebar .sidebar-title {
+      margin-top: 0px;
+      margin-bottom: 10px;
+      font-size: 18px;
+      text-align: center;
+      border-bottom: none;
+    }
+    #sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+    }
+    #sidebar:not(.expanded) .btn-text {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #sidebar.expanded .btn-text {
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+    #sidebar.expanded ~ #main-content {
+      margin-left: 250px;
+    }
+	#main-content {
+	margin-left: 10px;
+	  flex: 1; 
+	  display: flex;
+	  flex-direction: column;
+	  transition: margin-left 0.3s ease;
+	}
+    #sidebar .add-btn:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    /* Drag Enabled (Light mode) */
+    .add-btn.drag-enabled {
+      background: #0096ff;
+    }
+    /* Drag Enabled (Dark mode) */
+    body.dark-mode .add-btn.drag-enabled {
+      background: #6c4ba3;
+    }
+    /* Drag Disabled (Light mode) */
+    .add-btn.drag-disabled {
+      background: #777;
+    }
+    /* Drag Disabled (Dark mode) */
+    body.dark-mode .add-btn.drag-disabled {
+      background: #555;
+    }
+
+    /* Global Dark Mode */
+    body.dark-mode {
+      background-color: #1e1e1e;
+      color: #c9d1d9;
+    }
+    body.dark-mode .container {
+      background-color: #2d2d30;
+      color: #c9d1d9;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    }
+    body.dark-mode .container:hover {
+      background-color: #343438;
+    }
+
+    body.dark-mode .collapsible {
+      background-color: #333336;
+      border-color: #444448;
+      color: #c9d1d9;
+    }
+    body.dark-mode .collapsible:hover {
+      background-color: #404044;
+    }
+    body.dark-mode .collapsible-text i,
+    body.dark-mode .icon-btn i,
+    body.dark-mode .expand-btn i,
+    body.dark-mode .copy-btn i,
+    body.dark-mode .delete-btn i,
+    body.dark-mode .add-btn i,
+    body.dark-mode .close-icon i {
+      color: #b197fc;
+    }
+    body.dark-mode .collapsible .collapsible-text {
+      color: #c9d1d9;
+    }
+    body.dark-mode .collapsible:hover .collapsible-text i,
+    body.dark-mode .icon-btn:hover i,
+    body.dark-mode .expand-btn:hover i,
+    body.dark-mode .copy-btn:hover i,
+    body.dark-mode .delete-btn:hover i,
+    body.dark-mode .add-btn:hover i,
+    body.dark-mode .close-icon:hover i {
+      color: #c9aafc;
+    }
+    body.dark-mode .content,
+    body.dark-mode pre {
+      background-color: #333336;
+      border-color: #3d3d40;
+      color: #c9d1d9;
+    }
+    body.dark-mode h2,
+    body.dark-mode p {
+      color: #c9d1d9;
+      border-bottom-color: #5e5e62;
+    }
+    body.dark-mode a {
+      color: #a37acc;
+    }
+    body.dark-mode a:hover {
+      color: #b58ddb;
+    }
+    body.dark-mode .delete-btn {
+      color: #a37acc;
+    }
+    body.dark-mode .delete-btn:hover {
+      color: #ff6b6b;
+    }
+    body.dark-mode textarea,
+    body.dark-mode input {
+      background-color: #252527;
+      color: #ddd;
+      border: 1px solid #444448;
+      border-radius: 20px;
+    }
+    body.dark-mode textarea:focus,
+    body.dark-mode input:focus {
+      border-color: #a37acc;
+      outline: none;
+    }
+    body.dark-mode .sortable-chosen {
+      background-color: #454548;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+    }
+    body.dark-mode .sortable-ghost {
+      background-color: #353538;
+      opacity: 0.4;
+    }
+    body.dark-mode .modal {
+      background-color: rgba(0, 0, 0, 0.85);
+    }
+    body.dark-mode .modal-content {
+      background-color: #2b2b2e;
+      color: #c9d1d9;
+    }
+    body.dark-mode .close-icon {
+      color: #ff6b6b;
+    }
+    body.dark-mode #confirm-delete {
+      background: #a37acc;
+    }
+    body.dark-mode #confirm-delete:hover {
+      background: #b58ddb;
+    }
+    body.dark-mode #cancel-delete {
+      background: #555;
+      color: #fff;
+    }
+    body.dark-mode #cancel-delete:hover {
+      background: #666;
+    }
+    body.dark-mode #confirm-modal-content {
+      background: #2b2b2e !important;
+      color: #c9d1d9 !important;
+    }
+    body.dark-mode #confirm-modal-content h3 {
+      color: #a37acc !important;
+    }
+    body.dark-mode #confirm-modal-content p {
+      color: #c9d1d9 !important;
+    }
+    body.dark-mode #cancel-delete {
+      background: #555 !important;
+      color: #fff !important;
+    }
+    body.dark-mode #cancel-delete:hover {
+      background: #666 !important;
+    }
+    body.dark-mode #confirm-delete {
+      background: #a37acc !important;
+    }
+    body.dark-mode #confirm-delete:hover {
+      background: #b58ddb !important;
+    }
+
+    .sortable-chosen {
+      transform: scale(1.05) translateZ(0);
+      opacity: 0.8;
+      background-color: #e0f2ff;
+      cursor: grabbing;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      position: relative;
+      z-index: 9999 !important;
+      pointer-events: auto;
+      transition: none !important;
+    }
+    .sortable-ghost {
+      opacity: 0.2;
+    }
+    .container {
+      will-change: transform;
+      transform: translateZ(0);
+    }
+
+    /* General Body styles */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      text-align: center;
+    }
+
+    /* Icon button styles */
+    .icon-btn i,
+    .expand-btn i {
+      font-size: 14px;
+      color: #007bff;
+    }
+    .expand-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 18px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: #007bff;
+    }
+    .expand-btn:hover {
+      color: #007acc;
+    }
+
+    /* Collapsible styling */
+    .collapsible {
+      font-size: 14px;
+      width: 100%;
+      margin-top: 5px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: white;
+      border: 1px solid #0096ff;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .collapsible .collapsible-text {
+      color: #000;
+    }
+    .collapsible .collapsible-text i {
+      color: #007bff;
+    }
+    .content {
+      display: none;
+      padding: 10px 0;
+    }
+	#sidebar-logo {
+	  text-align: center;
+	  margin-bottom: 10px;
+	}
+
+	#sidebar-logo .logo {
+	  max-width: 80%;
+	  height: auto;
+	}
+
+	/* Light mode: show the blue version */
+	.light-logo {
+	  display: block;
+	}
+	.dark-logo {
+	  display: none;
+	}
+
+	/* Dark mode: hide the blue and show the purple version */
+	body.dark-mode .light-logo {
+	  display: none;
+	}
+	body.dark-mode .dark-logo {
+	  display: block;
+	}
+
+    /* Grid container for all battlecards */
+    .grid-container {
+      transform: translateZ(0);
+      will-change: transform;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(200px, 1fr));
+      gap: 50px;
+      padding: 30px 40px 30px 30px;
+      width: 100%;
+      box-sizing: border-box;
+      margin: auto;
+      overflow-x: hidden;
+    }
+    .container {
+      width: 100%;
+      min-width: 200px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      padding: 15px;
+      transition: transform 0.3s ease-in-out;
+      position: relative;
+      text-align: left;
+      will-change: transform;
+      backface-visibility: hidden;
+      transform: translateZ(0);
+    }
+    .container:hover {
+	  transform: scale(1.01) translateZ(0);
+	}
+    h2 {
+      font-size: 16px;
+      color: #333;
+      border-bottom: 2px solid #0096ff;
+      padding-bottom: 3px;
+      cursor: pointer;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    pre {
+      background: #fff;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-family: monospace;
+      border: 1px solid #ddd;
+      cursor: pointer;
+      white-space: pre-wrap;
+    }
+    .add-btn {
+      background: #0096ff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .add-btn:hover {
+      background: #007acc;
+    }
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #007bff;
+      padding: 5px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    .delete-btn:hover {
+      color: red;
+    }
+
+    /* Modal styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 50%;
+      max-width: 600px;
+      text-align: left;
+      position: relative;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .close-icon {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 17px;
+      cursor: pointer;
+      color: red;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    @media (max-width: 1200px) {
+      .grid-container {
+        grid-template-columns: repeat(3, minmax(200px, 1fr));
+      }
+    }
+    @media (max-width: 992px) {
+      .grid-container {
+        grid-template-columns: repeat(2, minmax(200px, 1fr));
+      }
+    }
+    @media (max-width: 768px) {
+      .grid-container {
+        grid-template-columns: repeat(1, minmax(200px, 1fr));
+      }
+    }
+    @media (max-width: 480px) {
+      .grid-container {
+        grid-template-columns: repeat(1, minmax(200px, 1fr));
+      }
+    }
+    html,
+    body {
+      overflow-x: hidden;
+    }
+  </style>
+  <script>
+    let disableBeforeUnload = false;
+    let persistentFileLoaded = false;
+    let loadedFileName = "battlecards.json";
+    let dragEnabled = false;
+    let sortableInstance;
+    let editEnabled = false;
+    let allExpanded = false;
+    let currentCardToDelete = null;
+    let currentEditableInput = null;
+    let sortAscending = true; // For A-Z vs. Z-A
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const gridContainer = document.getElementById("grid-container");
+
+      // Initialize Sortable
+      sortableInstance = new Sortable(gridContainer, {
+        disabled: true,
+        animation: 200,
+        ghostClass: "sortable-ghost",
+        chosenClass: "sortable-chosen",
+        dragClass: "sortable-drag",
+        forceFallback: true,
+        fallbackOnBody: true,
+        swapThreshold: 0.65,
+        onEnd: saveBattlecardsToLocalStorage,
+      });
+
+      // Load existing from localStorage
+      loadBattlecardsFromLocalStorage();
+
+      // beforeunload
+      window.addEventListener("beforeunload", beforeUnloadHandler);
+
+      // Cancel clear
+      document
+        .getElementById("cancel-clear")
+        .addEventListener("click", function () {
+          document.getElementById("confirm-clear-modal").style.display = "none";
+        });
+
+      // Confirm delete
+      document
+        .getElementById("confirm-delete")
+        .addEventListener("click", function () {
+          if (currentCardToDelete) {
+            currentCardToDelete.remove();
+            saveBattlecardsToLocalStorage();
+            currentCardToDelete = null;
+          }
+          document.getElementById("confirm-modal").style.display = "none";
+        });
+      document
+        .getElementById("cancel-delete")
+        .addEventListener("click", function () {
+          currentCardToDelete = null;
+          document.getElementById("confirm-modal").style.display = "none";
+        });
+
+      // Confirm clear
+      document.getElementById("confirm-clear").addEventListener("click", function () {
+        disableBeforeUnload = true;
+        window.removeEventListener("beforeunload", beforeUnloadHandler);
+        localStorage.clear();
+        setTimeout(() => {
+          window.location.reload();
+        }, 10);
+      });
+
+      // Search input
+      document
+        .getElementById("custom-search-input")
+        .addEventListener("input", function () {
+          filterBattlecards(this.value.toLowerCase());
+        });
+
+      // If the sidebar is not expanded, hide text
+      const sidebar = document.getElementById("sidebar");
+      if (!sidebar.classList.contains("expanded")) {
+        document.querySelectorAll("#sidebar .btn-text").forEach((el) => {
+          el.style.opacity = "0";
+        });
+      }
+	  
+  // Load theme from localStorage
+  const theme = localStorage.getItem("theme");
+  const themeToggleBtn = document.getElementById("theme-toggle-btn");
+  if (theme === "dark") {
+    document.body.classList.add("dark-mode");
+    document.documentElement.classList.add("dark-mode");
+    themeToggleBtn.innerHTML =
+      '<i class="fas fa-sun"></i> <span class="btn-text">Light Mode</span>';
+  } else {
+    document.body.classList.remove("dark-mode");
+    document.documentElement.classList.remove("dark-mode");
+    themeToggleBtn.innerHTML =
+      '<i class="fas fa-moon"></i> <span class="btn-text">Dark Mode</span>';
+  }
+
+  // Periodic auto-save if persistent
+  setInterval(() => {
+    if (persistentFileLoaded) {
+      saveBattlecardsToLocalStorage();
+      console.log("Auto-updated local storage.");
+    }
+  }, 60000);
+});
+
+    function beforeUnloadHandler(e) {
+      forceBlurAll();
+      let active = document.activeElement;
+      if (active && active.tagName.toLowerCase() === "textarea") {
+        active.dataset.original = active.value;
+      }
+      setTimeout(() => {
+        saveBattlecardsToLocalStorage();
+      }, 50);
+    }
+
+    function forceBlurAll() {
+      document.querySelectorAll("input, textarea").forEach((el) => el.blur());
+    }
+
+    /***************************************************
+     * Reordering
+     ***************************************************/
+    function reorderBattlecards() {
+      const container = document.getElementById("grid-container");
+      const cards = Array.from(
+        container.querySelectorAll(".container:not(#battlecard-template)")
+      );
+
+      // Favorites at top, then alphabetical by first <h2>
+      cards.sort((a, b) => {
+        const favA = a.classList.contains("favorite") ? 0 : 1;
+        const favB = b.classList.contains("favorite") ? 0 : 1;
+        if (favA !== favB) return favA - favB;
+
+        // Compare the detectionName h2 (data-field="detectionTitle" or so).
+        // For simplicity, compare by whatever "h2" is first, or detectionName field.
+        const aName = (a.querySelector('[data-field="detectionName"]')?.innerText || "")
+          .toLowerCase();
+        const bName = (b.querySelector('[data-field="detectionName"]')?.innerText || "")
+          .toLowerCase();
+        return aName.localeCompare(bName);
+      });
+
+      cards.forEach((card) => container.appendChild(card));
+    }
+    window.reorderBattlecards = reorderBattlecards;
+
+    function filterBattlecards(query) {
+      const cards = document.querySelectorAll(
+        ".grid-container .container:not(#battlecard-template)"
+      );
+      cards.forEach((card) => {
+        const cardText = card.innerText.toLowerCase();
+        card.style.display = cardText.includes(query) ? "block" : "none";
+      });
+    }
+
+    /***************************************************
+     * Data Gathering and Applying (using data-field)
+     ***************************************************/
+
+			// Pulls all data from a single card into a JS object
+			function gatherCardData(card) {
+			  const cardData = {};
+			  cardData.favorite = card.classList.contains("favorite");
+
+			  const fields = card.querySelectorAll("[data-field]");
+			  fields.forEach((el) => {
+				const fieldName = el.getAttribute("data-field");
+				// Always gather raw HTML so we keep <b>, <ul>, etc.
+				cardData[fieldName] = el.innerHTML.trim();
+			  });
+
+			  return cardData;
+			}
+
+
+		function applyCardData(card, cardData) {
+		  // Favorite star
+		  if (cardData.favorite) {
+			card.classList.add("favorite");
+			const favBtn = card.querySelector(".favorite-btn i");
+			if (favBtn) favBtn.className = "fa-solid fa-star";
+		  } else {
+			card.classList.remove("favorite");
+			const favBtn = card.querySelector(".favorite-btn i");
+			if (favBtn) favBtn.className = "fa-regular fa-star";
+		  }
+
+		  // Populate each data-field with the stored HTML
+		  const fields = card.querySelectorAll("[data-field]");
+		  fields.forEach((el) => {
+			const fieldName = el.getAttribute("data-field");
+			const val = cardData[fieldName] || "";
+			el.innerHTML = val; // keep any <b>, <i>, <ul> tags, etc.
+		  });
+		}
+
+
+    /***************************************************
+     * Save to JSON (Download)
+     ***************************************************/
+    function saveBattlecards() {
+      const battlecards = [];
+      document
+        .querySelectorAll(".grid-container .container:not(#battlecard-template)")
+        .forEach((card) => {
+          const data = gatherCardData(card);
+          battlecards.push(data);
+        });
+
+      const blob = new Blob([JSON.stringify(battlecards, null, 2)], {
+        type: "application/json",
+      });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "battlecards.json";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    /***************************************************
+     * Handle File Upload (Import)
+     ***************************************************/
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          localStorage.setItem("battlecardsAutoSave", JSON.stringify(data));
+          loadBattlecardsFromLocalStorage();
+        } catch (error) {
+          console.error("Error parsing JSON:", error);
+          alert("Error reading your JSON file.");
+        }
+      };
+      reader.readAsText(file);
+    }
+    window.handleFileUpload = handleFileUpload;
+
+    /***************************************************
+     * Load from localStorage -> UI
+     ***************************************************/
+    function loadBattlecardsFromLocalStorage() {
+      const savedData = localStorage.getItem("battlecardsAutoSave");
+      if (!savedData) return;
+
+      const battlecards = JSON.parse(savedData);
+      const gridContainer = document.getElementById("grid-container");
+
+      // Remove existing
+      document
+        .querySelectorAll(".grid-container .container:not(#battlecard-template)")
+        .forEach((el) => el.remove());
+
+      // Rebuild from JSON
+      battlecards.forEach((cardData) => {
+        let template = document.getElementById("battlecard-template");
+        let newCard = template.cloneNode(true);
+        newCard.removeAttribute("id");
+        newCard.style.display = "block";
+
+        applyCardData(newCard, cardData);
+
+        attachCollapsibleListeners(newCard);
+        attachEditableListeners(newCard);
+
+        gridContainer.appendChild(newCard);
+      });
+
+      reorderBattlecards();
+		buildDynamicFilters(); // <--- Refresh dynamic filter
+    }
+
+    /***************************************************
+     * Save to localStorage
+     ***************************************************/
+    function saveBattlecardsToLocalStorage() {
+      const battlecards = [];
+      document
+        .querySelectorAll(".grid-container .container:not(#battlecard-template)")
+        .forEach((card) => {
+          const data = gatherCardData(card);
+          battlecards.push(data);
+        });
+      localStorage.setItem("battlecardsAutoSave", JSON.stringify(battlecards));
+    }
+
+    /***************************************************
+     * Collapsibles + Copy
+     ***************************************************/
+    function attachCollapsibleListeners(context) {
+      let collapsibles = context.querySelectorAll(".collapsible");
+      collapsibles.forEach((btn) => {
+        btn.addEventListener("click", function (event) {
+          if (event.target.closest(".copy-btn")) return;
+          let content = this.nextElementSibling;
+          content.style.display = content.style.display === "block" ? "none" : "block";
+        });
+      });
+
+      // Copy button for query
+      let copyButtons = context.querySelectorAll(".copy-btn");
+      copyButtons.forEach((btn) => {
+        btn.addEventListener("click", function (event) {
+          event.stopPropagation();
+          let preElement =
+            btn.closest(".collapsible").nextElementSibling.querySelector("pre");
+          let queryText = preElement.innerText;
+          navigator.clipboard.writeText(queryText);
+          btn.innerHTML = '<i class="fas fa-check"></i>';
+          setTimeout(() => {
+            btn.innerHTML = '<i class="fa-regular fa-copy"></i>';
+          }, 2000);
+        });
+      });
+
+  // Remove this block that re-adds "click" to everything in .content
+  // context.querySelectorAll(".content *")
+  //   .forEach((el) => {
+  //     el.removeEventListener("click", makeEditable);
+  //     el.addEventListener("click", (event) => makeEditable(event, el));
+  //   });
+    }
+
+	function expandBattlecard(element, event) {
+	  event.stopPropagation();
+	  let modal = document.getElementById("modal");
+	  let modalContent = document.getElementById("modal-content");
+
+	  // Copy the battlecard's inner HTML into the modal
+	  modalContent.innerHTML = element.parentElement.innerHTML;
+
+	  // Remove elements that shouldn't appear in the modal
+	  // Remove the expand and delete buttons
+	  let expandBtn = modalContent.querySelector(".expand-btn");
+	  if (expandBtn) expandBtn.remove();
+	  let deleteBtn = modalContent.querySelector(".delete-btn");
+	  if (deleteBtn) deleteBtn.remove();
+
+	  // Remove the add buttons (for tech/client) from the modal
+	  modalContent.querySelectorAll(".add-tech-btn, .add-client-btn").forEach(btn => btn.remove());
+	  
+	  // Remove the remove (X) spans from any tags
+	  modalContent.querySelectorAll(".remove-tech-span, .remove-client-span").forEach(span => span.remove());
+	  
+	  // Also remove any trash icons if needed
+	  modalContent.querySelectorAll("i.fa-trash").forEach(icon => icon.remove());
+
+	  // Create a close button and append it
+	  let closeBtn = document.createElement("span");
+	  closeBtn.className = "close-icon";
+	  closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+	  closeBtn.onclick = function () {
+		modal.style.display = "none";
+	  };
+	  modalContent.appendChild(closeBtn);
+
+	  // Allow clicking on the modal backdrop (outside modal-content) to close the modal
+	  modal.onclick = function(e) {
+		if (e.target === modal) {
+		  modal.style.display = "none";
+		}
+	  };
+
+	  attachCollapsibleListeners(modalContent);
+	  modal.style.display = "flex";
+	}
+
+    function deleteBattlecard(button) {
+      currentCardToDelete = button.closest(".container");
+      document.getElementById("confirm-modal").style.display = "flex";
+    }
+
+    function toggleDrag() {
+      dragEnabled = !dragEnabled;
+      sortableInstance.option("disabled", !dragEnabled);
+
+      const btn = document.getElementById("drag-toggle-btn");
+      const icon = btn.querySelector("i");
+      const btnText = btn.querySelector(".btn-text");
+
+      if (dragEnabled) {
+        icon.className = "fas fa-hand-pointer";
+        btnText.textContent = "Disable Drag";
+        btn.classList.remove("drag-disabled");
+        btn.classList.add("drag-enabled");
+      } else {
+        icon.className = "fas fa-ban";
+        btnText.textContent = "Enable Drag";
+        btn.classList.remove("drag-enabled");
+        btn.classList.add("drag-disabled");
+      }
+    }
+
+    function attachEditableListeners(card) {
+      // For anything with data-field or any child elements
+      card.querySelectorAll("[data-field], h2, p, pre, ul li a").forEach((el) => {
+        el.onclick = function (event) {
+          makeEditable(event, el);
+        };
+      });
+    }
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const body = document.body;
+  const btn = document.getElementById("theme-toggle-btn");
+  const icon = btn.querySelector("i");
+  const btnText = btn.querySelector(".btn-text");
+
+  // Toggle dark mode classes on the root elements.
+  html.classList.toggle("dark-mode");
+  body.classList.toggle("dark-mode");
+
+  if (body.classList.contains("dark-mode")) {
+    icon.className = "fas fa-sun";
+    btnText.textContent = "Light Mode";
+    localStorage.setItem("theme", "dark");
+  } else {
+    icon.className = "fas fa-moon";
+    btnText.textContent = "Dark Mode";
+    localStorage.setItem("theme", "light");
+  }
+}
+
+
+    function toggleSearchBar() {
+      const container = document.getElementById("custom-search-container");
+      if (window.getComputedStyle(container).display === "none") {
+        openSearchBar();
+      } else {
+        closeSearchBar();
+      }
+    }
+
+    function openSearchBar() {
+      document.getElementById("custom-search-container").style.display = "flex";
+      document.getElementById("custom-search-input").focus();
+    }
+
+    function closeSearchBar() {
+      document.getElementById("custom-search-container").style.display = "none";
+      document.getElementById("custom-search-input").value = "";
+      filterBattlecards("");
+    }
+
+    function toggleAllCollapsibles() {
+      allExpanded = !allExpanded;
+      document
+        .querySelectorAll(".grid-container .container .content")
+        .forEach((content) => {
+          content.style.display = allExpanded ? "block" : "none";
+        });
+
+      const btn = document.getElementById("collapse-toggle-btn");
+      if (allExpanded) {
+        btn.innerHTML =
+          '<i class="fas fa-angle-double-down"></i> <span class="btn-text">Collapse All</span>';
+      } else {
+        btn.innerHTML =
+          '<i class="fas fa-angle-double-up"></i> <span class="btn-text">Expand All</span>';
+      }
+    }
+
+    function sortBattlecards() {
+      const container = document.getElementById("grid-container");
+      const cards = Array.from(
+        container.querySelectorAll(".container:not(#battlecard-template)")
+      );
+      const favoriteCards = cards.filter((card) => card.classList.contains("favorite"));
+      let nonFavoriteCards = cards.filter((card) => !card.classList.contains("favorite"));
+
+      const getDetectionText = (card) => {
+        // Compare by detectionName field
+        return (
+          card.querySelector('[data-field="detectionName"]')?.innerText.trim().toUpperCase() ||
+          ""
+        );
+      };
+
+      sortAscending = !sortAscending;
+      nonFavoriteCards.sort((a, b) => {
+        const detectionA = getDetectionText(a);
+        const detectionB = getDetectionText(b);
+        return sortAscending
+          ? detectionA.localeCompare(detectionB)
+          : detectionB.localeCompare(detectionA);
+      });
+      favoriteCards.sort((a, b) => {
+        const detectionA = getDetectionText(a);
+        const detectionB = getDetectionText(b);
+        return sortAscending
+          ? detectionA.localeCompare(detectionB)
+          : detectionB.localeCompare(detectionA);
+      });
+
+      container.innerHTML = "";
+      [...favoriteCards, ...nonFavoriteCards].forEach((card) => container.appendChild(card));
+
+      saveBattlecardsToLocalStorage();
+
+      const btn = document.getElementById("sort-btn");
+      btn.innerHTML = sortAscending
+        ? '<i class="fas fa-sort-alpha-down"></i> <span class="btn-text">Sort A-Z</span>'
+        : '<i class="fas fa-sort-alpha-up"></i> <span class="btn-text">Sort Z-A</span>';
+    }
+	function toggleSidebar() {
+	  const sidebar = document.getElementById("sidebar");
+	  const toggleBtnIcon = document.querySelector("#sidebar-toggle-btn i");
+	  sidebar.classList.toggle("expanded");
+	  if (sidebar.classList.contains("expanded")) {
+		toggleBtnIcon.className = "fas fa-chevron-left";
+	  } else {
+		toggleBtnIcon.className = "fas fa-chevron-right";
+	  }
+	}
+
+
+    function showClearStorageModal() {
+      document.getElementById("confirm-clear-modal").style.display = "flex";
+    }
+
+    function addBattlecard() {
+      let template = document.getElementById("battlecard-template");
+      let newCard = template.cloneNode(true);
+      newCard.style.display = "block";
+      newCard.removeAttribute("id");
+      document.getElementById("grid-container").appendChild(newCard);
+
+      attachCollapsibleListeners(newCard);
+      attachEditableListeners(newCard);
+
+      saveBattlecardsToLocalStorage();
+    }
+
+    function toggleFavorite(btn) {
+      const card = btn.closest(".container");
+      card.classList.toggle("favorite");
+      const icon = btn.querySelector("i");
+      if (card.classList.contains("favorite")) {
+        icon.className = "fa-solid fa-star";
+      } else {
+        icon.className = "fa-regular fa-star";
+      }
+      saveBattlecardsToLocalStorage();
+      reorderBattlecards();
+    }
+    window.toggleFavorite = toggleFavorite;
+
+    /***************************************************
+     * Edit Mechanism
+     ***************************************************/
+    function toggleEdit() {
+      editEnabled = !editEnabled;
+      const btn = document.getElementById("edit-toggle-btn");
+      if (editEnabled) {
+        btn.innerHTML =
+          '<i class="fas fa-edit"></i> <span class="btn-text">Disable Edit</span>';
+      } else {
+        btn.innerHTML =
+          '<i class="fas fa-lock"></i> <span class="btn-text">Enable Edit</span>';
+      }
+    }
+
+		function createFormattingToolbar() {
+		  // If you only want one toolbar at a time, clear existing
+		  let toolbar = document.getElementById("text-format-toolbar");
+		  if (!toolbar) {
+			toolbar = document.createElement("div");
+			toolbar.id = "text-format-toolbar";
+			document.body.appendChild(toolbar);
+		  }
+
+		  // Clear any old buttons if the toolbar was created before
+		  toolbar.innerHTML = "";
+
+		  const buttons = [
+			{ format: "bold", icon: "fa-bold", title: "Bold" },
+			{ format: "italic", icon: "fa-italic", title: "Italic" },
+			{ format: "underline", icon: "fa-underline", title: "Underline" },
+			{ format: "h1", text: "H1", title: "Heading 1", size: "20px" },
+			{ format: "h2", text: "H2", title: "Heading 2", size: "18px" },
+			{ format: "h3", text: "H3", title: "Heading 3", size: "16px" },
+			{ format: "list-ol", icon: "fa-list-ol", title: "Numbered List" },
+			{ format: "list-ul", icon: "fa-list-ul", title: "Bullet List" },
+			{ format: "blockquote", icon: "fa-quote-left", title: "Blockquote" },
+			{ format: "code", icon: "fa-code", title: "Inline Code" },
+			{ format: "code-block", icon: "fa-terminal", title: "Code Block" },
+			{ format: "link", icon: "fa-link", title: "Hyperlink" },
+			{ format: "clear-formatting", icon: "fa-eraser", title: "Clear Formatting" },
+			{ format: "exit", icon: "fa-check", title: "Done" },
+		  ];
+
+		  buttons.forEach(({ format, icon, text, title, size }) => {
+			const btn = document.createElement("button");
+			btn.className = "format-btn";
+			btn.title = title;
+
+			// If it's one of your "H1","H2","H3" items, use text instead of icon
+			if (text) {
+			  btn.innerHTML = `<span style="font-size:${size};">${text}</span>`;
+			} else {
+			  btn.innerHTML = `<i class="fas ${icon}"></i>`;
+			}
+
+			// Use pointerdown (and/or mousedown) to preserve selection in the <textarea>
+			btn.addEventListener("pointerdown", (evt) => {
+			  evt.preventDefault(); 
+			  handleToolbarClick(format);
+			});
+			// (optional) also do mousedown for older browsers:
+			btn.addEventListener("mousedown", (evt) => {
+			  evt.preventDefault();
+			  handleToolbarClick(format);
+			});
+
+			toolbar.appendChild(btn);
+		  });
+		}
+
+		/**
+		 * This function decides whether to finalize editing ("Done") or
+		 * apply a format to the current textarea.
+		 */
+		function handleToolbarClick(format) {
+		  if (!currentEditableInput) {
+			console.warn("handleToolbarClick: No currentEditableInput!");
+			return;
+		  }
+
+		  if (format === "exit") {
+			exitEditMode();
+		  } else {
+			// Now we pass the contentEditable DIV to our new approach
+			applyRealFormat(currentEditableInput, format);
+		  }
+		}
+
+
+		function applyRealFormat(contentEditableDiv, format) {
+		  contentEditableDiv.focus();
+		  const sel = window.getSelection();
+		  if (!sel.rangeCount) return;
+		  const range = sel.getRangeAt(0);
+		  if (range.collapsed) {
+			console.warn("No text selected, skipping format.");
+			return;
+		  }
+
+		  // Helper to wrap the user selection in some tag:
+		  function wrapSelection(tagName, className) {
+			const extracted = range.extractContents();
+			const wrapper = document.createElement(tagName);
+			if (className) wrapper.className = className;
+			wrapper.appendChild(extracted);
+			range.insertNode(wrapper);
+			sel.removeAllRanges();
+			const newRange = document.createRange();
+			newRange.selectNodeContents(wrapper);
+			sel.addRange(newRange);
+		  }
+
+		  // Clear formatting => remove all HTML tags from selection
+		  function removeAllHtmlTagsFromSelection() {
+			const selectedText = range.toString(); 
+			range.deleteContents();
+			const textNode = document.createTextNode(selectedText);
+			range.insertNode(textNode);
+			sel.removeAllRanges();
+			const newRange = document.createRange();
+			newRange.selectNode(textNode);
+			sel.addRange(newRange);
+		  }
+
+		  switch (format) {
+			case "bold":
+			  wrapSelection("b");
+			  break;
+
+			case "italic":
+			  wrapSelection("i");
+			  break;
+
+			case "underline":
+			  wrapSelection("u");
+			  break;
+
+			case "h1":
+			  wrapSelection("h1");
+			  break;
+
+			case "h2":
+			  wrapSelection("h2");
+			  break;
+
+			case "h3":
+			  wrapSelection("h3");
+			  break;
+
+			case "list-ol": {
+			  const selectedText = range.toString().trim();
+			  range.deleteContents();
+			  const ol = document.createElement("ol");
+			  selectedText.split(/\r?\n/).forEach((line) => {
+				if (line.trim()) {
+				  const li = document.createElement("li");
+				  li.textContent = line.trim();
+				  ol.appendChild(li);
+				}
+			  });
+			  range.insertNode(ol);
+			  break;
+			}
+
+			case "list-ul": {
+			  const selectedText = range.toString().trim();
+			  range.deleteContents();
+			  const ul = document.createElement("ul");
+			  selectedText.split(/\r?\n/).forEach((line) => {
+				if (line.trim()) {
+				  const li = document.createElement("li");
+				  li.textContent = line.trim();
+				  ul.appendChild(li);
+				}
+			  });
+			  range.insertNode(ul);
+			  break;
+			}
+
+			case "blockquote":
+			  wrapSelection("blockquote");
+			  break;
+
+			// If you want "Inline Code" to preserve <b>, <i> too, do innerHTML here
+			case "code":
+			  // If you *don't* want to preserve HTML in inline code, keep textContent
+			  // codeEl.textContent = codeText;
+			  // But if you do, use innerHTML:
+			  wrapSelection("code");
+			  break;
+
+			case "code-block": {
+			  // Instead of textContent, use innerHTML to preserve <b>, <ul>, etc.
+			  const codeText = range.toString();
+			  range.deleteContents();
+
+			  const pre = document.createElement("pre");
+			  const codeEl = document.createElement("code");
+			  // This is the critical change:
+			  codeEl.innerHTML = codeText;
+			  pre.appendChild(codeEl);
+			  range.insertNode(pre);
+
+			  // Reselect
+			  sel.removeAllRanges();
+			  const newRange = document.createRange();
+			  newRange.selectNode(pre);
+			  sel.addRange(newRange);
+			  break;
+			}
+
+			case "link": {
+			  const url = prompt("Enter URL:", "https://");
+			  if (!url) return;
+			  const anchorFrag = range.extractContents();
+			  const anchor = document.createElement("a");
+			  anchor.href = url;
+			  anchor.target = "_blank";
+			  anchor.appendChild(anchorFrag);
+			  range.insertNode(anchor);
+			  sel.removeAllRanges();
+			  const newRange = document.createRange();
+			  newRange.selectNode(anchor);
+			  sel.addRange(newRange);
+			  break;
+			}
+
+			case "clear-formatting":
+			  removeAllHtmlTagsFromSelection();
+			  break;
+
+			default:
+			  console.warn("Unknown format:", format);
+			  break;
+		  }
+		}
+
+
+		/********************************************************
+		 * 1) A small helper that decides if the data-field
+		 *    should be multiline. (We keep it so we don't
+		 *    remove any existing code.)
+		 ********************************************************/
+		function shouldForceMultiline(dataField) {
+		  // You had these as examples. Keep them or adjust:
+		  const multilineFields = [
+			"categoryName",
+			"detectionLogic",
+			"responseActions",
+			"investigationSteps",
+		  ];
+		  return multilineFields.includes(dataField);
+		}
+
+
+		function makeEditable(evt, element) {
+		  evt.stopPropagation();
+		  if (!editEnabled) return;
+
+		  // Force exit if something else is editing
+		  const alreadyEditing = document.querySelector(".editing");
+		  if (alreadyEditing && alreadyEditing !== element) {
+			exitEditMode();
+		  }
+		  if (alreadyEditing === element) return;
+
+		  const dataField = element.getAttribute("data-field") || "";
+		  
+		  // <--- STORE the old tag name:
+		  const originalTag = element.tagName.toLowerCase();
+
+		  // Create <div contentEditable> ...
+		  const editableDiv = document.createElement("div");
+		  editableDiv.classList.add("editing");
+		  editableDiv.contentEditable = "true";
+		  editableDiv.style.width = "100%";
+		  editableDiv.style.boxSizing = "border-box";
+
+		  // Save the old tag name
+		  editableDiv.setAttribute("data-original-tag", originalTag);
+
+		  if (dataField) {
+			editableDiv.setAttribute("data-field", dataField);
+		  }
+
+		  // Copy old element's HTML
+		  editableDiv.innerHTML = element.innerHTML;
+
+		  // Replace
+		  element.replaceWith(editableDiv);
+		  editableDiv.focus();
+		  currentEditableInput = editableDiv;
+
+		  // Show toolbar, etc.
+		  createFormattingToolbar();
+		}
+
+
+		function exitEditMode() {
+		  const editingDiv = document.querySelector(".editing");
+		  if (!editingDiv) return;
+
+		  // Retrieve the original tag
+		  const originalTag = editingDiv.getAttribute("data-original-tag") || "span";
+		  const dataField = editingDiv.getAttribute("data-field") || "";
+
+		  // Create the same tag we started with, instead of forcing <p> or <span>
+		  const newEl = document.createElement(originalTag);
+		  if (dataField) {
+			newEl.setAttribute("data-field", dataField);
+		  }
+
+		  // Copy final HTML
+		  newEl.innerHTML = editingDiv.innerHTML;
+
+		  // Make it clickable for next time
+		  newEl.onclick = (evt) => makeEditable(evt, newEl);
+
+		  // Swap in
+		  editingDiv.replaceWith(newEl);
+
+		  // Save
+		  saveBattlecardsToLocalStorage();
+
+		  // Remove toolbar
+		  const toolbar = document.getElementById("text-format-toolbar");
+		  if (toolbar) {
+			toolbar.remove();
+		  }
+		  currentEditableInput = null;
+		}
+
+		function gatherCardData(card) {
+		  const cardData = {};
+		  cardData.favorite = card.classList.contains("favorite");
+
+		  const fields = card.querySelectorAll("[data-field]");
+		  fields.forEach((el) => {
+			const fieldName = el.getAttribute("data-field");
+			cardData[fieldName] = el.innerHTML.trim(); 
+			// For tags, if you prefer plain text or CSV, parse them here
+		  });
+
+		  return cardData;
+		}
+		
+		function applyCardData(card, cardData) {
+		  // Favorite star
+		  if (cardData.favorite) {
+			card.classList.add("favorite");
+			const favBtn = card.querySelector(".favorite-btn i");
+			if (favBtn) favBtn.className = "fa-solid fa-star";
+		  } else {
+			card.classList.remove("favorite");
+			const favBtn = card.querySelector(".favorite-btn i");
+			if (favBtn) favBtn.className = "fa-regular fa-star";
+		  }
+
+		  // Populate each data-field
+		  const fields = card.querySelectorAll("[data-field]");
+		  fields.forEach((el) => {
+			const fieldName = el.getAttribute("data-field");
+			let val = cardData[fieldName] || "";
+			el.innerHTML = val;
+		  });
+
+		  // Now, after those fields are set, let's render the technology & client in the UI:
+		  renderTechnologyAndClient(card);
+		}
+
+		function renderTechnologyAndClient(card) {
+		  // Grab the hidden data fields
+		  const techField = card.querySelector('[data-field="technologyTag"]');
+		  const clientField = card.querySelector('[data-field="clientTag"]');
+
+		  const techText = techField ? techField.innerText.trim() : "";
+		  const clientText = clientField ? clientField.innerText.trim() : "";
+
+		  // Grab the visible spans
+		  const techSpan = card.querySelector(".technology-icon"); // your HTML uses .technology-icon
+		  const clientSpan = card.querySelector(".client-tag");    // your HTML uses .client-tag
+
+		  // Grab the “+Tech” and “+Client” buttons
+		  const addTechBtn = card.querySelector(".add-tech-btn");
+		  const addClientBtn = card.querySelector(".add-client-btn");
+
+		  //----------------------------------------
+		  // Handle Technology
+		  //----------------------------------------
+		  if (techText) {
+			// 1) Show the text in the .technology-icon span
+			if (techSpan) {
+			  techSpan.textContent = techText;   // just text, not icon
+			  techSpan.style.display = "inline-block";
+			}
+
+			// 2) Hide the “+Tech” button
+			if (addTechBtn) addTechBtn.style.display = "none";
+
+			// 3) Add or update a small “remove tech” ‘x’ if not already
+			let removeTechSpan = card.querySelector(".remove-tech-span");
+			if (!removeTechSpan) {
+			  removeTechSpan = document.createElement("span");
+			  removeTechSpan.className = "remove-tech-span";
+			  removeTechSpan.style = "cursor: pointer; color: white; margin-left: 5px;";
+			  removeTechSpan.textContent = "x";
+			  removeTechSpan.onclick = () => removeTechnologyTag(card);
+			  // Append it to the techSpan
+			  techSpan.appendChild(removeTechSpan);
+			}
+		  } else {
+			// If no tech set:
+			if (techSpan) {
+			  techSpan.textContent = "";
+			  techSpan.style.display = "none";
+			}
+			if (addTechBtn) addTechBtn.style.display = "inline-block";
+
+			// Remove the remove-tech x if it exists
+			const removeTechSpan = card.querySelector(".remove-tech-span");
+			if (removeTechSpan) removeTechSpan.remove();
+		  }
+
+		  //----------------------------------------
+		  // Handle Client
+		  //----------------------------------------
+		  if (clientText) {
+			// 1) Show the text in the .client-tag span
+			if (clientSpan) {
+			  clientSpan.textContent = clientText;
+			  clientSpan.style.display = "inline-block";
+			}
+
+			// 2) Hide the “+Client” button
+			if (addClientBtn) addClientBtn.style.display = "none";
+
+			// 3) Add or update a small “remove client” ‘x’
+			let removeClientSpan = card.querySelector(".remove-client-span");
+			if (!removeClientSpan) {
+			  removeClientSpan = document.createElement("span");
+			  removeClientSpan.className = "remove-client-span";
+			  removeClientSpan.style = "cursor: pointer; color: white; margin-left: 5px;";
+			  removeClientSpan.textContent = "x";
+			  removeClientSpan.onclick = () => removeClientTag(card);
+			  // Append to the clientSpan
+			  clientSpan.appendChild(removeClientSpan);
+			}
+		  } else {
+			// If no client set:
+			if (clientSpan) {
+			  clientSpan.textContent = "";
+			  clientSpan.style.display = "none";
+			}
+			if (addClientBtn) addClientBtn.style.display = "inline-block";
+
+			// Remove the remove-client x if it exists
+			const removeClientSpan = card.querySelector(".remove-client-span");
+			if (removeClientSpan) removeClientSpan.remove();
+		  }
+		}
+
+		// Collect unique tech/client from current cards
+		function buildDynamicFilters() {
+		  const cards = document.querySelectorAll(".grid-container .container:not(#battlecard-template)");
+		  const allTech = new Set();
+		  const allClients = new Set();
+
+		  cards.forEach(card => {
+			const t = card.querySelector('[data-field="technologyTag"]')?.innerText.trim();
+			if (t) allTech.add(t);
+			const c = card.querySelector('[data-field="clientTag"]')?.innerText.trim();
+			if (c) allClients.add(c);
+		  });
+
+		  const techSelect = document.getElementById("tech-filter");
+		  const clientSelect = document.getElementById("client-filter");
+
+		  if (techSelect) {
+			// Start with the default option
+			techSelect.innerHTML = `<option value="">Select Filter</option>`;
+			allTech.forEach(tech => {
+			  techSelect.innerHTML += `<option value="${tech.toLowerCase()}">${tech}</option>`;
+			});
+		  }
+
+		  if (clientSelect) {
+			clientSelect.innerHTML = `<option value="">Select Filter</option>`;
+			allClients.forEach(client => {
+			  clientSelect.innerHTML += `<option value="${client.toLowerCase()}">${client}</option>`;
+			});
+		  }
+		}
+		
+		function clearFilters() {
+		  document.getElementById("tech-filter").value = "";
+		  document.getElementById("client-filter").value = "";
+		  filterByTechAndClient();
+		}
+
+
+		function getIconForTechnology(techName) {
+		  const name = techName.toLowerCase();
+		  
+		  if (name.includes("sentinel")) {
+			// 1) Real Microsoft Sentinel logo
+			//    Official brand assets are typically an image or svg. 
+			//    For simplicity, let's assume you have a sentinel.png in the same folder:
+			return `<img src="images/sentinel.png" alt="Sentinel" title="Sentinel" style="height:16px;">`;
+			
+		  } else if (name.includes("splunk")) {
+			// 2) Splunk official brand
+			return `<img src="images/splunk.png" alt="Splunk" title="Splunk" style="height:16px;">`;
+
+		  } else if (name.includes("google")) {
+			// 3) Google Cloud or Google Security icon
+			return `<img src="images/google-cloud.png" alt="Google" title="Google" style="height:16px;">`;
+		  }
+		  
+		  // fallback
+		  return `<i class="fas fa-question-circle" title="Unknown Tech"></i>`;
+		}
+
+		
+		function addTechnologyTag(btn) {
+		  const card = btn.closest(".container");
+		  const techField = card.querySelector('[data-field="technologyTag"]');
+		  if (!techField) return;
+
+		  const newTech = prompt("Enter technology (e.g. 'Sentinel', 'Splunk', 'GoogleSecOps'):") || "";
+		  const trimmed = newTech.trim();
+		  if (!trimmed) return;
+
+		  // Overwrite old technology
+		  techField.innerText = trimmed;
+
+		  // Re-render the UI for technology and client tags
+		  renderTechnologyAndClient(card);
+
+		  // Save the updated battlecards
+		  saveBattlecardsToLocalStorage();
+
+		  // Update the filter dropdowns immediately
+		  buildDynamicFilters();
+		}
+		
+		function removeTechnologyTag(card) {
+		  const techField = card.querySelector('[data-field="technologyTag"]');
+		  if (techField) techField.innerText = "";
+		  renderTechnologyAndClient(card);
+		  saveBattlecardsToLocalStorage();
+		}
+		
+		function removeClientTag(card) {
+		  const clientField = card.querySelector('[data-field="clientTag"]');
+		  if (clientField) clientField.innerText = "";
+		  renderTechnologyAndClient(card);
+		  saveBattlecardsToLocalStorage();
+		}
+		
+		function addClientTag(btn) {
+		  // 1) Find the parent card
+		  const card = btn.closest(".container");
+		  // 2) Find the hidden field for client
+		  const clientField = card.querySelector('[data-field="clientTag"]');
+		  if (!clientField) return;
+
+		  // 3) Prompt user
+		  const newClient = prompt("Enter client name:") || "";
+		  const trimmed = newClient.trim();
+		  if (!trimmed) return; // user canceled or empty input
+
+		  // 4) Overwrite existing client field
+		  clientField.innerText = trimmed;
+
+		  // 5) Re-render the UI for technology and client tags
+		  renderTechnologyAndClient(card);
+
+		  // 6) Save to local storage
+		  saveBattlecardsToLocalStorage();
+
+		  // 7) Update the filter dropdowns immediately
+		  buildDynamicFilters();
+		}
+
+		function filterByTechAndClient() {
+		  const techValue = document.getElementById("tech-filter").value.toLowerCase();
+		  const clientValue = document.getElementById("client-filter").value.toLowerCase();
+
+		  const cards = document.querySelectorAll(".grid-container .container:not(#battlecard-template)");
+		  cards.forEach(card => {
+			const t = (card.querySelector('[data-field="technologyTag"]')?.innerText || "").toLowerCase();
+			const c = (card.querySelector('[data-field="clientTag"]')?.innerText || "").toLowerCase();
+
+			const matchTech = !techValue || t === techValue;
+			const matchClient = !clientValue || c === clientValue;
+
+			card.style.display = (matchTech && matchClient) ? "block" : "none";
+		  });
+		}
+
+		function toggleSearchExpand() {
+		  const searchContainer = document.getElementById("search-container");
+		  searchContainer.classList.toggle("expanded");
+		  // If expanded, focus the input
+		  if (searchContainer.classList.contains("expanded")) {
+			setTimeout(() => {
+			  document.getElementById("search-field").focus();
+			}, 300);
+		  }
+		}
+
+		function toggleFilterDropdown() {
+		  const dropdown = document.getElementById("filter-dropdown");
+		  dropdown.classList.toggle("show");
+		}
+
+  </script>
+</head>
+<body>
+  <!-- Outer Flex Container -->
+  <div id="wrapper">
+    
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+      <div id="sidebar-header">
+        <h2 class="sidebar-title">Actions Menu</h2>
+        <button id="sidebar-toggle-btn" onclick="toggleSidebar()">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+      <button class="add-btn" onclick="saveBattlecards()">
+        <i class="fas fa-save"></i> <span class="btn-text">Save Battlecards</span>
+      </button>
+      <button class="add-btn drag-disabled" onclick="toggleDrag()" id="drag-toggle-btn">
+        <i class="fas fa-ban"></i> <span class="btn-text">Enable Drag</span>
+      </button>
+      <button class="add-btn" onclick="toggleAllCollapsibles()" id="collapse-toggle-btn">
+        <i class="fas fa-angle-double-up"></i> <span class="btn-text">Expand All</span>
+      </button>
+      <button class="add-btn" onclick="toggleTheme()" id="theme-toggle-btn">
+        <i class="fas fa-moon"></i> <span class="btn-text">Dark Mode</span>
+      </button>
+      <button class="add-btn" onclick="sortBattlecards()" id="sort-btn">
+        <i class="fas fa-sort-alpha-down"></i> <span class="btn-text">Sort Battlecards</span>
+      </button>
+      <button class="add-btn" onclick="document.getElementById('file-upload').click();">
+        <i class="fas fa-upload"></i> <span class="btn-text">Load from JSON</span>
+      </button>
+      <input
+        type="file"
+        id="file-upload"
+        style="display:none;"
+        onchange="handleFileUpload(event)"
+      />
+      <button class="add-btn" onclick="addBattlecard()">
+        <i class="fas fa-plus"></i> <span class="btn-text">Add Battlecard</span>
+      </button>
+      <button class="add-btn" onclick="showClearStorageModal()">
+        <i class="fas fa-eraser"></i> <span class="btn-text">Clear Storage</span>
+      </button>
+	<button class="add-btn" id="edit-toggle-btn" onclick="toggleEdit()">
+	  <i class="fas fa-lock"></i> <span class="btn-text">Enable Edit</span>
+	</button>
+      <div class="sidebar-footer">
+        <p>Created by <strong>Marcos Foley Sanchez</strong></p>
+      </div>
+    </div>
+    <!-- END SIDEBAR -->
+
+    <!-- MAIN CONTENT -->
+    <div id="main-content">
+      
+      <!-- TOP BAR -->
+      <div class="top-bar">
+	  		<div id="sidebar-logo">
+		  <img src="https://i.ibb.co/pBQ18cc2/hitachi.png" alt="Hitachi Logo" class="logo light-logo">
+		  <img src="https://i.ibb.co/rfZLm0mw/hitachi-1.png" alt="Hitachi Logo" class="logo dark-logo">
+		</div>
+        <div class="left-section">
+          <h1>Hitachi Detection Battlecards</h1>
+        </div>
+        <div class="right-section">
+          <div class="icon-button search-icon" onclick="toggleSearchExpand()">
+            <i class="fas fa-search"></i>
+          </div>
+          <div class="search-input-container" id="search-container">
+            <input
+              type="text"
+              id="search-field"
+              placeholder="Search battlecards..."
+              oninput="filterBattlecards(this.value.toLowerCase())"
+            />
+          </div>
+          <div class="icon-button filter-icon" onclick="toggleFilterDropdown()">
+            <i class="fas fa-filter"></i>
+          </div>
+			<div class="filter-dropdown" id="filter-dropdown">
+			  <div class="filter-line">
+				<label for="tech-filter">TechTag:</label>
+				<select id="tech-filter" onchange="filterByTechAndClient()">
+				  <option value="">Select Filter</option>
+				</select>
+			  </div>
+			  <div class="filter-line">
+				<label for="client-filter">ClientTag:</label>
+				<select id="client-filter" onchange="filterByTechAndClient()">
+				  <option value="">Select Filter</option>
+				</select>
+			  </div>
+			  <button class="clear-filters-btn" onclick="clearFilters()">Clear Filters</button>
+			</div>
+        </div>
+      </div>
+      <!-- END TOP BAR -->
+
+      <!-- CONTENT AREA -->
+      <div class="content-area">
+        <!-- GRID CONTAINER & TEMPLATE -->
+        <div class="grid-container" id="grid-container">
+          <div class="container" id="battlecard-template" style="display: none;">
+			 <button class="expand-btn" onclick="expandBattlecard(this, event)">
+			  <i class="fas fa-up-right-and-down-left-from-center"></i>
+			</button>
+			<button class="favorite-btn" onclick="toggleFavorite(this); event.stopPropagation();">
+			  <i class="fa-regular fa-star"></i>
+			</button>
+			<button class="delete-btn" onclick="deleteBattlecard(this)">
+			  <i class="fa-solid fa-trash"></i>
+			</button>
+			<span class="technology-icon"></span>
+			<span class="client-tag"></span>
+            <button class="add-btn add-tech-btn" style="margin-top:6px; padding:3px 10px; font-size:12px;" onclick="addTechnologyTag(this)">
+              + Tech
+            </button>
+            <button class="add-btn add-client-btn" style="margin-top:6px; padding:3px 10px; font-size:12px;" onclick="addClientTag(this)">
+              + Tenant
+            </button>
+
+            <!-- Hidden fields -->
+            <div data-field="technologyTag" style="display:none;"></div>
+            <div data-field="clientTag" style="display:none;"></div>
+
+            <!-- The rest of the template as before -->
+            <h2 data-field="detectionTitle">Detection</h2>
+            <p data-field="detectionName">Detection Name</p>
+            <h2 data-field="categoryTitle">Category</h2>
+            <p data-field="categoryName">Execution</p>
+            <h2 data-field="descriptionTitle">Description</h2>
+            <p data-field="descriptionContent">Detection Description</p>
+            <h2>MITRE ATT&CK TTPs</h2>
+            <ul data-field="mitreAttacks">
+              <li><a href="#" target="_blank">TXXXX - Example TTP</a></li>
+            </ul>
+            <button class="collapsible">
+              <span class="collapsible-text"><i class="fas fa-code"></i> Query (KQL, SPL)</span>
+              <span class="icon-btn copy-btn"><i class="fa-regular fa-copy"></i></span>
+            </button>
+            <div class="content" style="display: none;">
+              <pre data-field="query" style="white-space: pre-wrap;">
+  SecurityAlert
+  | where ProviderName == "Microsoft Defender for Endpoint"
+  | where AlertName == "Detection"
+              </pre>
+            </div>
+            <button class="collapsible">
+              <span class="collapsible-text"><i class="fas fa-shield-alt"></i> Detection Logic</span>
+            </button>
+            <div class="content" data-field="detectionLogic">
+              <p>Detection Logic Details</p>
+            </div>
+            <button class="collapsible">
+              <span class="collapsible-text"><i class="fas fa-search"></i> Investigation Steps</span>
+            </button>
+            <div class="content" data-field="investigationSteps">
+              <p>- Step 1</p>
+              <p>- Step 2</p>
+            </div>
+            <button class="collapsible">
+              <span class="collapsible-text"><i class="fas fa-bolt"></i> Response Actions</span>
+            </button>
+            <div class="content" data-field="responseActions">
+              <p>- Step 1</p>
+              <p>- Step 2</p>
+            </div>
+          </div>
+        </div>
+        <!-- END GRID CONTAINER -->
+
+        <!-- Full-screen modal -->
+        <div id="modal" class="modal">
+          <div class="modal-content" id="modal-content"></div>
+        </div>
+
+        <!-- Confirm Delete Modal -->
+        <div id="confirm-modal" class="modal" style="display: none;">
+          <div class="modal-content" id="confirm-modal-content" style="max-width: 400px; text-align: center;">
+            <h3 class="sidebar-title" style="margin-top: 0;">Delete Confirmation</h3>
+            <p style="font-size: 16px;">Are you sure you want to delete this battlecard?</p>
+            <div style="margin-top: 20px;">
+              <button id="cancel-delete" style="background: #ccc; border: none; color: #333; padding: 8px 12px; border-radius: 4px; margin-right: 10px; cursor: pointer;">
+                Cancel
+              </button>
+              <button id="confirm-delete" style="background: #007bff; border: none; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer;">
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirm Clear LocalStorage Modal -->
+        <div id="confirm-clear-modal" class="modal" style="display: none;">
+          <div class="modal-content" id="confirm-clear-modal-content" style="max-width: 400px; text-align: center;">
+            <h3 class="sidebar-title" style="margin-top: 0;">Clear Storage Confirmation</h3>
+            <p style="font-size: 16px;">Are you sure you want to clear all saved battlecards from local storage?</p>
+            <div style="margin-top: 20px;">
+              <button id="cancel-clear" style="background: #ccc; border: none; color: #333; padding: 8px 12px; border-radius: 4px; margin-right: 10px; cursor: pointer;">
+                Cancel
+              </button>
+              <button id="confirm-clear" style="background: #007bff; border: none; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer;">
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div> <!-- END .content-area -->
+    </div> <!-- END #main-content -->
+  </div> <!-- END #wrapper -->
+</body>
+
+</html>
